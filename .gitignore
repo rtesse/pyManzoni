@@ -1,3 +1,10 @@
 *.idea/
 .DS_Store
 *__pychache__/
+*.pyc
+app_install
+build_application.sh
+build
+dist
+pyManzoni.app
+test*

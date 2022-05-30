@@ -1,0 +1,4 @@
+[submodule "libs/georges"]
+	path = libs/georges
+	url = https://github.com/rtesse/georges.git
+	branch = develop
