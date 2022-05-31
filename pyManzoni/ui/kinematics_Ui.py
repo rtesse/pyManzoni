@@ -1,4 +1,3 @@
-import sys
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import *
 from georges_core import Kinematics, KinematicsException
@@ -10,7 +9,7 @@ ROW_TO_UNITS = {1: ureg.MeV,
                 4: ureg.cm}
 
 
-class Kinematic_Ui:
+class KinematicUi:
 
     def __init__(self, kinematics_layout):
 
@@ -79,14 +78,3 @@ class Kinematic_Ui:
 
     def error_layout(self, message):
         QMessageBox.warning(self, "Error", message, QMessageBox.Ok)
-
-
-if __name__ == '__main__':
-    # Create the Qt Application
-    app = QApplication(sys.argv)
-    # Create and show the form
-    form = Kinematic_Ui()
-    form.create_Kinematic_Ui()
-    form.show()
-    # Run the main Qt loop
-    sys.exit(app.exec_())

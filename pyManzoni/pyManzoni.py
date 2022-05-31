@@ -1,9 +1,7 @@
 import sys
-from PySide2 import QtCore, QtGui, QtWidgets
+from PySide2 import QtWidgets
 from ui.pyManzoni_MainUi import MainWindow
 from tracker import Tracker
-from PySide2.QtCore import QRect, Qt
-from PySide2.QtWidgets import *
 
 
 class PyManzoni(MainWindow):

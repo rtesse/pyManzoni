@@ -97,6 +97,8 @@ class LayoutWidgets:
         wtab.addTab(self.main_window.Yplane_view, u"Y plane")
         wtab.addTab(self.main_window.line_view, u"3D view")
 
+        wtab.setTabEnabled(3, False)
+
         hl.addWidget(wtab)
         self.dock_widget_line.setWidget(dock_widget_contents_line)
         self.main_window.addDockWidget(Qt.TopDockWidgetArea, self.dock_widget_line)
@@ -147,4 +149,3 @@ class LayoutWidgets:
 
         dock_widget_properties.setWidget(dock_widget_contents_sequence)
         self.main_window.addDockWidget(Qt.LeftDockWidgetArea, dock_widget_properties)
-

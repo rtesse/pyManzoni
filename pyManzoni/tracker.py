@@ -1,23 +1,12 @@
 import tempfile
-
-import pandas as pd
 import os
-from PySide2 import QtWidgets, QtCore, QtGui
-from PySide2.QtCore import QDir
+from PySide2 import QtCore
 from PySide2.QtWidgets import *
-
-import georges_core
 import plotly.express as px
-from georges_core.sequences import SurveySequence
 import georges
 from georges import manzoni
-from georges.manzoni import Input, Beam
+from georges.manzoni import Beam
 from georges.vis import ManzoniPlotlyArtist
-from georges.manzoni.integrators import MadXIntegrator, \
-    TransportFirstOrderTaylorIntegrator, \
-    TransportSecondOrderTaylorIntegrator, \
-    TransportFirstOrderTaylorIntegratorExact, \
-    TransportSecondOrderTaylorIntegratorExact
 
 
 class Tracker(object):
@@ -83,8 +72,8 @@ class Tracker(object):
 
     def plot_beam_observer(self):
         data_observer = self.beam_observer.to_df().loc[str(self.layout_sequence.element_list.currentText())]
-        artist = ManzoniPlotlyArtist(layout={"autosize": True,
-                                             'margin': dict(t=0, b=50, l=50, r=50)})
+        # artist = ManzoniPlotlyArtist(layout={"autosize": True,
+        #                                      'margin': dict(t=0, b=50, l=50, r=50)})
 
         fig = px.density_heatmap(data_observer,
                                  x=data_observer['BEAM_OUT'][:, 0],

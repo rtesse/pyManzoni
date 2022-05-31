@@ -5,9 +5,9 @@ from PySide2.QtWidgets import *
 
 from .menu_bar import MenuBar
 from .layout_widgets import LayoutWidgets
-from .kinematics_Ui import Kinematic_Ui
-from .beam_Ui import Beam_Ui
-from .sequence_ui import Sequence_Ui
+from .kinematics_Ui import KinematicUi
+from .beam_Ui import BeamUi
+from .sequence_ui import SequenceUi
 
 minimum_height = 700
 minimum_width = 800
@@ -27,13 +27,13 @@ class MainWindow(QMainWindow):
         self.layout_widget = LayoutWidgets(self, minimum_height, minimum_width)
 
         # Create the kinematics UI and add to kinematics layout.
-        self.k_ui = Kinematic_Ui(self.kinematics_layout)
+        self.k_ui = KinematicUi(self.kinematics_layout)
 
         # Create the beam UI and add to beam properties.
-        self.b_ui = Beam_Ui(self.beam_layout)
+        self.b_ui = BeamUi(self.beam_layout)
 
         # Create the sequence UI
-        self.s_ui = Sequence_Ui(self.sequence_layout, self.element_list)
+        self.s_ui = SequenceUi(self.sequence_layout, self.element_list)
 
     @property
     def tracking_button(self):
