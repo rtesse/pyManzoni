@@ -5,7 +5,7 @@ from georges_core.sequences import SurveySequence
 from georges_core.units import ureg as _ureg
 
 
-class Sequence_Ui:
+class SequenceUi:
 
     def __init__(self, sequence_layout=None, element_list=None):
 

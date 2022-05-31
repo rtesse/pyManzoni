@@ -10,7 +10,7 @@ import tempfile
 import shutil
 
 
-class Beam_Ui:
+class BeamUi:
 
     def __init__(self, beam_layout):
 
@@ -333,7 +333,6 @@ class Beam_Ui:
             self.horizontalLayout.itemAt(0).widget().blockSignals(False)
 
         if self.beamtype == 'Twiss':
-            pass
             self.horizontalLayout.itemAt(0).widget().blockSignals(True)
             mean_val = self.beam.mean
             # I don't want to change the values dynamically
