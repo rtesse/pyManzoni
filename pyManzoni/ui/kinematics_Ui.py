@@ -46,7 +46,6 @@ class KinematicUi:
 
     def get_df_kinematics(self):
         df_kinematics = QTableWidget()
-        df_kinematics.setObjectName(u"df_kinematics")
         df_kinematics.setColumnCount(2)
         df_kinematics.setRowCount(5)
 
