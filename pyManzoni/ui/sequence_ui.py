@@ -1,5 +1,7 @@
 import sys
-from PySide2.QtWidgets import *
+from PySide2.QtWidgets import QFileDialog, QWidget, QTableWidgetItem, \
+    QHBoxLayout, QTableWidget, QDialogButtonBox, QPushButton,\
+    QApplication, QMainWindow, QVBoxLayout
 import georges_core
 from georges_core.sequences import SurveySequence
 from georges_core.units import ureg as _ureg
@@ -26,7 +28,6 @@ class SequenceUi:
         self.load_sequence_button = QPushButton(u"Load")
         self.load_sequence_button.clicked.connect(self.load_sequence)
         self.track_sequence_button = QPushButton("Track")
-        self.track_sequence_button.setObjectName(u'Track_button')
         button_layout.addWidget(self.load_sequence_button)
         button_layout.addWidget(self.track_sequence_button)
         button_layout.addWidget(buttonBox)
@@ -47,8 +48,7 @@ class SequenceUi:
 
         if df_filename:  # To avoid error if cancel is pressed
             # Give a default kinematics, this will be overwritten before the tracking
-            self.sequence = SurveySequence(filename=df_filename,
-                                           kinematics=georges_core.Kinematics(230 * _ureg.MeV))
+            self.sequence = SurveySequence(filename=df_filename, kinematics=georges_core.Kinematics(230 * _ureg.MeV))
             self.sequence.expand()
             self.fill_table()
             self.fill_combobox()
@@ -71,7 +71,7 @@ class SequenceUi:
                         x = ' '.join(map(str, x))
                     else:
                         x = '{:.3f}'.format(x.magnitude)
-                except:
+                except BaseException:
                     x = sequence_df.iloc[i, j]
                 if x:
                     self.sequence_tableWidget.setItem(i, j, QTableWidgetItem(x))
@@ -102,7 +102,7 @@ if __name__ == '__main__':
     glw = QWidget(beam_widget)
     bl = QVBoxLayout(glw)
     bl.setContentsMargins(0, 0, 0, 0)
-    form = Sequence_Ui(bl)
+    form = SequenceUi(bl)
     w.setLayout(form.layout_sequence)
     w.setCentralWidget(glw)
     w.show()

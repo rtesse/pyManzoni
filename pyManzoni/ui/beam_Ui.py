@@ -1,22 +1,23 @@
 import sys
 from PySide2 import QtCore
 from PySide2.QtCore import QRect, Qt
-from PySide2.QtWidgets import *
+from PySide2.QtWidgets import QFileDialog, QMessageBox, QWidget, QTableWidgetItem, \
+    QHBoxLayout, QTableWidget, QDialogButtonBox, QPushButton, QComboBox, QTabWidget,\
+    QApplication, QMainWindow, QVBoxLayout
 from PySide2.QtWebEngineWidgets import QWebEngineView
 from georges_core import Distribution
 from georges_core.units import ureg as _ureg
 import plotly.express as px
-import tempfile
 import shutil
 
 
 class BeamUi:
 
-    def __init__(self, beam_layout):
+    def __init__(self, beam_layout, tmp_folder: str = None):
 
         self.layout_beam = beam_layout
         self.beam = Distribution().from_5d_multigaussian_distribution(n=2)  # Default beam, 2 to avoid nan
-        self.tmp_dir = tempfile.mkdtemp()
+        self.tmp_dir = tmp_folder
         self.plotwindows = None
         self.initialize_Ui()
 
@@ -263,8 +264,7 @@ class BeamUi:
                                                                      yrms=yrms * _ureg.m,
                                                                      pyrms=pyrms * _ureg.radians,
                                                                      dpp=dpp,
-                                                                     dpprms=dpprms
-                                                                     )
+                                                                     dpprms=dpprms)
         if self.beamtype == 'Twiss':
             mean_val = self.beam.mean
             n = self.beam.n_particles if self.tableWidget.item(1, 1) is None else float(
@@ -273,8 +273,7 @@ class BeamUi:
             px = mean_val['PX'] if self.tableWidget.item(3, 1) is None else float(self.tableWidget.item(3, 1).text())
             y = mean_val['Y'] if self.tableWidget.item(4, 1) is None else float(self.tableWidget.item(4, 1).text())
             py = mean_val['PY'] if self.tableWidget.item(5, 1) is None else float(self.tableWidget.item(5, 1).text())
-            dpp = mean_val['DPP'] if self.tableWidget.item(6, 1) is None else float(
-                self.tableWidget.item(6, 1).text())
+            dpp = mean_val['DPP'] if self.tableWidget.item(6, 1) is None else float(self.tableWidget.item(6, 1).text())
             betx = 1 if self.tableWidget.item(7, 1) is None else float(self.tableWidget.item(7, 1).text())
             alfx = 0 if self.tableWidget.item(8, 1) is None else float(self.tableWidget.item(8, 1).text())
             bety = 1 if self.tableWidget.item(9, 1) is None else float(self.tableWidget.item(9, 1).text())
@@ -385,10 +384,12 @@ class BeamUi:
         self.plotwindows.show()
 
     def set_plot(self):
-        template = {"layout": {"autosize": True,
-                               'margin': dict(t=0, b=50, l=50, r=50),
-                               }
-                    }
+        template = {
+            "layout": {
+                "autosize": True,
+                'margin': dict(t=0, b=50, l=50, r=50),
+            }
+        }
 
         self.generate_plot(template, 'X', 'Y', 'x (m)', 'y (m)')
         self.generate_plot(template, 'X', 'PX', 'x (m)', 'xp (radians)')
@@ -435,7 +436,7 @@ if __name__ == '__main__':
     glw = QWidget(beam_widget)
     bl = QVBoxLayout(glw)
     bl.setContentsMargins(0, 0, 0, 0)
-    form = Beam_Ui(bl)
+    form = BeamUi(bl)
     w.setLayout(form.layout_beam)
     w.setCentralWidget(glw)
     w.show()

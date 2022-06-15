@@ -1,12 +1,9 @@
 from PySide2.QtCore import Qt
-from PySide2.QtWidgets import *
+from PySide2.QtWidgets import QMessageBox, QTableWidgetItem, QTableWidget
 from georges_core import Kinematics, KinematicsException
 from georges_core.units import ureg
 
-ROW_TO_UNITS = {1: ureg.MeV,
-                2: ureg.MeV / ureg.c,
-                3: ureg.T * ureg.m,
-                4: ureg.cm}
+ROW_TO_UNITS = {1: ureg.MeV, 2: ureg.MeV / ureg.c, 3: ureg.T * ureg.m, 4: ureg.cm}
 
 
 class KinematicUi:
@@ -28,7 +25,7 @@ class KinematicUi:
             self.kinematics = new_kinematics
 
         except KinematicsException:
-            self.error_layout("Invalid value encoutered in Kinematics")
+            self.error_layout("Invalid value encountered in Kinematics")
 
         if new_kinematics:
             self.layout_kin.itemAt(0).widget().blockSignals(True)

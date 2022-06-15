@@ -1,5 +1,9 @@
+import shutil
 import sys
+import logging
+import tempfile
 from PySide2 import QtWidgets
+from PySide2.QtWidgets import QMessageBox
 from ui.pyManzoni_MainUi import MainWindow
 from tracker import Tracker
 
@@ -7,61 +11,55 @@ from tracker import Tracker
 class PyManzoni(MainWindow):
 
     def __init__(self):
-        super().__init__()
-        self.ui = MainWindow()
-        # # Define the kinematics
-        # self.called = False
-        #
-        # # Define the class for the sequence
-        self.tracker = Tracker(layout_results=self.layout_widget, layout_sequence=self.s_ui)
-        #
-        # # Connect buttons and actions
-        # # self.connect_shortcut()
+
+        # Create a temporary directory
+        self.tmp_folder = tempfile.TemporaryDirectory()
+        self.tmp_folder_name = self.tmp_folder.name
+
+        self.ui = super().__init__(tmp_folder=self.tmp_folder_name)
+        self.tracker = Tracker(layout_results=self.layout_widget,
+                               layout_sequence=self.s_ui,
+                               tmp_folder=self.tmp_folder_name)
+
+        # Connect buttons and actions
+        self.connect_shortcut()
         self.connect_button()
 
+    def connect_shortcut(self):
+        self.menu_bar.trackAction.triggered.connect(self.track)
+        self.menu_bar.loadAction.triggered.connect(self.tracker.layout_sequence.load_sequence)
+        self.menu_bar.saveAction.triggered.connect(self.tracker.save_observer_data)
+
     def connect_button(self):
-        # self.ui.element_list.activated.connect(self.tracker.set_plotting_element)
         self.tracking_button.setCheckable(True)
         self.tracking_button.toggle()
         self.tracking_button.clicked.connect(self.track)
 
-    def track(self):
-        self.tracker(sequence=self.s_ui.sequence,
-                     beam=self.b_ui.beam,
-                     kinematics=self.k_ui.kinematics)
+        self.layout_widget.main_window.save_plot.clicked.connect(self.tracker.save_observer_data)
 
-    # def vtk_button(self):
-    #     if not self.tracker.vtk_viewer.init_vtk:
-    #         self.tracker.vtk_viewer.setupUi()
-    #         self.tracker.vtk_viewer.show()
-    #     else:
-    #         self.tracker.vtk_viewer.showMaximized()
-    #
-    # def view_all(self):
-    #     self.ui.dockWidget_line.setVisible(True)
-    #     self.ui.dockWidget_sequence.setVisible(True)
-    #
-    # def close_app(self):
-    #     msgbox = QMessageBox(QMessageBox.Warning, "", "Are you sure you want to quit ? ",
-    #                          buttons=QMessageBox.No | QMessageBox.Yes,
-    #                          parent=self)
-    #     msgbox.setDefaultButton(QMessageBox.No)
-    #     if msgbox.exec_() == QMessageBox.Yes:
-    #         app.quit()
-    #
-    # def clean_tmp_files(self):
-    #     self.ui.clean_tmp_files()
-    #
-    # def closeEvent(self, event):
-    #     # do stuff
-    #     self.ui.clean_tmp_files()
-    #     if self.ui.plotwindows is not None and self.ui.plotwindows.isVisible:
-    #         self.ui.plotwindows.close()
-    #     event.accept()  # let the window close
+    def track(self):
+        self.tracker(sequence=self.s_ui.sequence, beam=self.b_ui.beam, kinematics=self.k_ui.kinematics)
+
+    def closeEvent(self, event):
+        print(event)
+        msgbox = QMessageBox(QMessageBox.Warning,
+                             "",
+                             "Are you sure you want to quit ? ",
+                             buttons=QMessageBox.No | QMessageBox.Yes,
+                             parent=self)
+        msgbox.setDefaultButton(QMessageBox.No)
+        if msgbox.exec_() == QMessageBox.Yes:
+            logging.info(f"Clean up folder {self.tmp_folder_name}")
+            shutil.rmtree(self.tmp_folder_name)
+            app.quit()
+            event.accept()  # let the window close
+        else:
+            event.ignore()
 
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     myapp = PyManzoni()
     myapp.show()
+    app.aboutToQuit.connect(lambda: myapp.closeEvent)  # FIXME Gives a type error because event is not defined
     sys.exit(app.exec_())

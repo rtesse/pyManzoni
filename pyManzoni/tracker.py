@@ -1,8 +1,8 @@
-import tempfile
 import os
+import shutil
 from PySide2 import QtCore
 from PySide2.QtCore import Qt
-from PySide2.QtWidgets import *
+from PySide2.QtWidgets import QFileDialog, QMessageBox, QWidget, QTableWidgetItem
 import plotly.express as px
 import pandas as _pd
 import georges_core
@@ -13,11 +13,12 @@ from georges.vis import ManzoniPlotlyArtist
 
 
 class Tracker(object):
-    def __init__(self, layout_results=None, layout_sequence=None):
+
+    def __init__(self, layout_results=None, layout_sequence=None, tmp_folder: str = None):
         self.layout_results = layout_results
         self.layout_sequence = layout_sequence
+        self.tmp_folder = tmp_folder
         self.tab3d = None
-        self._path = tempfile.TemporaryDirectory()
         self.manzoni_input = None
         self.has_run = False
         self.layout_results.main_window.element_list.activated.connect(self.set_plotting_element)
@@ -32,8 +33,7 @@ class Tracker(object):
                 self.sigma_observer = georges.manzoni.SigmaObserver()
                 self.beam_observer = georges.manzoni.BeamObserver()
                 self.manzoni_input.freeze()
-                self.manzoni_input.track(beam=Beam(kinematics=kinematics,
-                                                   distribution=beam.distribution),
+                self.manzoni_input.track(beam=Beam(kinematics=kinematics, distribution=beam.distribution),
                                          observers=[self.sigma_observer, self.beam_observer])
 
                 self.plot_sigma_observer()
@@ -47,32 +47,45 @@ class Tracker(object):
         artist.fig['autosize'] = True
         artist.tracking(self.sigma_observer, plane='both')
         artist.plot_cartouche(self.layout_sequence.sequence.df, vertical_position=1.15)
-        artist.save_html(os.path.join(self._path.name, "tracking_both_planes.html"))
-        self.layout_results.main_window.XYplane_view.load(
-            QtCore.QUrl().fromLocalFile(os.path.join(self._path.name, "tracking_both_planes.html")))
+        artist.save_html(os.path.join(self.tmp_folder, "tracking_XY_planes.html"))
+        self.layout_results.main_window.XYplane_view.load(QtCore.QUrl().fromLocalFile(
+            os.path.join(self.tmp_folder, "tracking_XY_planes.html")))
 
         artist = ManzoniPlotlyArtist(width=0.9 * self.layout_results.dock_widget_line.width(),
                                      height=0.8 * self.layout_results.dock_widget_line.height())
         artist.tracking(self.sigma_observer, plane='X')
         artist.plot_cartouche(self.layout_sequence.sequence.df, vertical_position=1.15)
-        artist.save_html(os.path.join(self._path.name, "tracking_X_plane.html"))
-        self.layout_results.main_window.Xplane_view.load(
-            QtCore.QUrl().fromLocalFile(os.path.join(self._path.name, "tracking_X_plane.html")))
+        artist.save_html(os.path.join(self.tmp_folder, "tracking_X_plane.html"))
+        self.layout_results.main_window.Xplane_view.load(QtCore.QUrl().fromLocalFile(
+            os.path.join(self.tmp_folder, "tracking_X_plane.html")))
 
         artist = ManzoniPlotlyArtist(width=0.9 * self.layout_results.dock_widget_line.width(),
                                      height=0.8 * self.layout_results.dock_widget_line.height())
         artist.tracking(self.sigma_observer, plane='Y')
         artist.plot_cartouche(self.layout_sequence.sequence.df, vertical_position=1.15)
-        artist.save_html(os.path.join(self._path.name, "tracking_Y_plane.html"))
-        self.layout_results.main_window.Yplane_view.load(
-            QtCore.QUrl().fromLocalFile(os.path.join(self._path.name, "tracking_Y_plane.html")))
+        artist.save_html(os.path.join(self.tmp_folder, "tracking_Y_plane.html"))
+        self.layout_results.main_window.Yplane_view.load(QtCore.QUrl().fromLocalFile(
+            os.path.join(self.tmp_folder, "tracking_Y_plane.html")))
 
-        self.layout_results.main_window.line_view.load(QtCore.QUrl().fromLocalFile(
-            os.path.split(os.path.abspath(__file__))[0] + r'/test.html'))
+        self.layout_results.main_window.line_view.load(
+            QtCore.QUrl().fromLocalFile(os.path.split(os.path.abspath(__file__))[0] + r'/test.html'))
 
     def set_plotting_element(self):
         if self.has_run:
             self.fill_beam_observer()
+
+    def save_observer_data(self):
+        if self.has_run:
+            filenames = [
+                "tracking_XY_planes.html", "tracking_X_plane.html", "tracking_Y_plane.html", "observer_X_Y.html",
+                "observer_X_XP.html", "observer_Y_YP.html", "observer_X_DPP.html"
+            ]
+            folderpath = QFileDialog.getExistingDirectory()
+            for f in filenames:
+                shutil.copy(os.path.join(self.tmp_folder, f), os.path.join(folderpath, f))
+
+        else:
+            QMessageBox.warning(QWidget(), "Warning", "No tracking performed", QMessageBox.Ok)
 
     def fill_beam_observer(self):
         data_observer = self.beam_observer.to_df().loc[str(self.layout_sequence.element_list.currentText())]
@@ -89,9 +102,9 @@ class Tracker(object):
                                  width=600,
                                  height=600)
         # fig.update_xaxes(title=label1)
-        fig.write_html(os.path.join(self._path.name, "observer_X_Y.html"))
-        self.layout_results.main_window.XY_histos.load(
-            QtCore.QUrl().fromLocalFile(os.path.join(self._path.name, "observer_X_Y.html")))
+        fig.write_html(os.path.join(self.tmp_folder, "observer_X_Y.html"))
+        self.layout_results.main_window.XY_histos.load(QtCore.QUrl().fromLocalFile(
+            os.path.join(self.tmp_folder, "observer_X_Y.html")))
 
         fig = px.density_heatmap(data_observer,
                                  x=data_observer['BEAM_OUT'][:, 0],
@@ -103,9 +116,9 @@ class Tracker(object):
                                  width=600,
                                  height=600)
         # fig.update_xaxes(title=label1)
-        fig.write_html(os.path.join(self._path.name, "observer_X_XP.html"))
-        self.layout_results.main_window.XXP_histo.load(
-            QtCore.QUrl().fromLocalFile(os.path.join(self._path.name, "observer_X_XP.html")))
+        fig.write_html(os.path.join(self.tmp_folder, "observer_X_XP.html"))
+        self.layout_results.main_window.XXP_histo.load(QtCore.QUrl().fromLocalFile(
+            os.path.join(self.tmp_folder, "observer_X_XP.html")))
 
         fig = px.density_heatmap(data_observer,
                                  x=data_observer['BEAM_OUT'][:, 2],
@@ -117,9 +130,9 @@ class Tracker(object):
                                  width=600,
                                  height=600)
         # fig.update_xaxes(title=label1)
-        fig.write_html(os.path.join(self._path.name, "observer_Y_YP.html"))
-        self.layout_results.main_window.YYP_histo.load(
-            QtCore.QUrl().fromLocalFile(os.path.join(self._path.name, "observer_Y_YP.html")))
+        fig.write_html(os.path.join(self.tmp_folder, "observer_Y_YP.html"))
+        self.layout_results.main_window.YYP_histo.load(QtCore.QUrl().fromLocalFile(
+            os.path.join(self.tmp_folder, "observer_Y_YP.html")))
 
         fig = px.density_heatmap(data_observer,
                                  x=data_observer['BEAM_OUT'][:, 0],
@@ -131,17 +144,19 @@ class Tracker(object):
                                  width=600,
                                  height=600)
         # fig.update_xaxes(title=label1)
-        fig.write_html(os.path.join(self._path.name, "observer_X_DPP.html"))
-        self.layout_results.main_window.XDPP_histo.load(
-            QtCore.QUrl().fromLocalFile(os.path.join(self._path.name, "observer_X_DPP.html")))
+        fig.write_html(os.path.join(self.tmp_folder, "observer_X_DPP.html"))
+        self.layout_results.main_window.XDPP_histo.load(QtCore.QUrl().fromLocalFile(
+            os.path.join(self.tmp_folder, "observer_X_DPP.html")))
 
         # Fill table
-        distribution = georges_core.Distribution(distribution=_pd.DataFrame(data={'X': data_observer['BEAM_OUT'][:, 0],
-                                                                                  'PX': data_observer['BEAM_OUT'][:, 1],
-                                                                                  'Y': data_observer['BEAM_OUT'][:, 2],
-                                                                                  'PY': data_observer['BEAM_OUT'][:, 3],
-                                                                                  'DPP': data_observer['BEAM_OUT'][:, 4]
-                                                                                  }))
+        distribution = georges_core.Distribution(distribution=_pd.DataFrame(
+            data={
+                'X': data_observer['BEAM_OUT'][:, 0],
+                'PX': data_observer['BEAM_OUT'][:, 1],
+                'Y': data_observer['BEAM_OUT'][:, 2],
+                'PY': data_observer['BEAM_OUT'][:, 3],
+                'DPP': data_observer['BEAM_OUT'][:, 4]
+            }))
         self.fill_table(distribution)
 
     def fill_table(self, distribution):
@@ -150,16 +165,18 @@ class Tracker(object):
         try:
             tws_distribution = distribution.twiss
         except ZeroDivisionError:
-            tws_distribution = {'emit_x': 0,
-                                'beta_x': 0,
-                                'alpha_x': 0,
-                                'disp_x': 0,
-                                'disp_xp': 0,
-                                'emit_y': 0,
-                                'beta_y': 0,
-                                'alpha_y': 0,
-                                'disp_y': 0,
-                                'disp_yp': 0}
+            tws_distribution = {
+                'emit_x': 0,
+                'beta_x': 0,
+                'alpha_x': 0,
+                'disp_x': 0,
+                'disp_xp': 0,
+                'emit_y': 0,
+                'beta_y': 0,
+                'alpha_y': 0,
+                'disp_y': 0,
+                'disp_yp': 0
+            }
 
         n_part_str = QTableWidgetItem(f"{distribution.n_particles}")
         n_part_str.setFlags(Qt.ItemIsEnabled)

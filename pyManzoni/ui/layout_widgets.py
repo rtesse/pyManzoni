@@ -1,9 +1,13 @@
-from PySide2.QtCore import *
-from PySide2.QtWidgets import *
+from PySide2.QtCore import Qt, QSize, QRect
+from PySide2.QtWidgets import QWidget, QTableWidgetItem, \
+    QHBoxLayout, QTableWidget, QPushButton,\
+    QMainWindow, QVBoxLayout, QComboBox, QLabel, QTabWidget, \
+    QDockWidget, QGridLayout, QSizePolicy
 from PySide2.QtWebEngineWidgets import QWebEngineView
 
 
 class LayoutWidgets:
+
     def __init__(self, main_window: QMainWindow = None, minimum_width: int = 0, minimum_height: int = 0):
         self.main_window = main_window
         self.minimum_width = minimum_width
@@ -30,7 +34,7 @@ class LayoutWidgets:
         self.create_sampler_widget()
         self.create_line_widget()
         self.create_properties_widget()
-        
+
     def create_sampler_widget(self):
         centralwidget = QWidget(self.main_window)
         centralwidget.setObjectName(u"centralwidget")

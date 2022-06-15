@@ -11,6 +11,22 @@ PySide2 = "^5.15.2"
 lmfit = "^1.0.2"
 mpld3 = "^0.5.5"
 georges = { path = "libs/georges/", develop = true }
+flake8 = "^4.0.1"
+yapf = "^0.32.0"
+
+[tool.poetry.extras]
+sphinx = [
+    "sphinx",
+    "sphinx-material",
+    "sphinx-automodapi",
+    "sphinxcontrib-bibtex",
+    "sphinx-copybutton",
+    "sphinx-autobuild",
+    "sphinx-rtd-theme",
+    "m2r2",
+    "pandoc",
+    "nbsphinx",
+]
 
 [tool.poetry.dev-dependencies]
 

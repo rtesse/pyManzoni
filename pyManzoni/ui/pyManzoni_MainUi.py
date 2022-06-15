@@ -1,7 +1,7 @@
 import sys
 
-from PySide2.QtCore import *
-from PySide2.QtWidgets import *
+from PySide2.QtCore import QSize
+from PySide2.QtWidgets import QApplication, QMainWindow
 
 from .menu_bar import MenuBar
 from .layout_widgets import LayoutWidgets
@@ -14,7 +14,8 @@ minimum_width = 800
 
 
 class MainWindow(QMainWindow):
-    def __init__(self):
+
+    def __init__(self, tmp_folder: str):
         super().__init__()
 
         self.setWindowTitle("PyManzoni")
@@ -30,7 +31,7 @@ class MainWindow(QMainWindow):
         self.k_ui = KinematicUi(self.kinematics_layout)
 
         # Create the beam UI and add to beam properties.
-        self.b_ui = BeamUi(self.beam_layout)
+        self.b_ui = BeamUi(self.beam_layout, tmp_folder)
 
         # Create the sequence UI
         self.s_ui = SequenceUi(self.sequence_layout, self.element_list)
