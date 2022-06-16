@@ -8,3 +8,5 @@ build
 dist
 pyManzoni.app
 test*
+.python-version
+*_build

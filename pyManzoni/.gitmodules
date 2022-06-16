@@ -1,4 +1,0 @@
-[submodule "libs/georges-core"]
-	path = libs/georges-core
-	url = https://github.com/rtesse/georges-core.git
-	branch = issue-8

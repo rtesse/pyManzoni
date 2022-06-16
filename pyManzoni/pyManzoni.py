@@ -27,18 +27,23 @@ class PyManzoni(MainWindow):
 
     def connect_shortcut(self):
         self.menu_bar.trackAction.triggered.connect(self.track)
-        self.menu_bar.loadAction.triggered.connect(self.tracker.layout_sequence.load_sequence)
-        self.menu_bar.saveAction.triggered.connect(self.tracker.save_observer_data)
+        self.menu_bar.loadAction.triggered.connect(
+            self.tracker.layout_sequence.load_sequence)
+        self.menu_bar.saveAction.triggered.connect(
+            self.tracker.save_observer_data)
 
     def connect_button(self):
         self.tracking_button.setCheckable(True)
         self.tracking_button.toggle()
         self.tracking_button.clicked.connect(self.track)
 
-        self.layout_widget.main_window.save_plot.clicked.connect(self.tracker.save_observer_data)
+        self.layout_widget.main_window.save_plot.clicked.connect(
+            self.tracker.save_observer_data)
 
     def track(self):
-        self.tracker(sequence=self.s_ui.sequence, beam=self.b_ui.beam, kinematics=self.k_ui.kinematics)
+        self.tracker(sequence=self.s_ui.sequence,
+                     beam=self.b_ui.beam,
+                     kinematics=self.k_ui.kinematics)
 
     def closeEvent(self, event):
         print(event)
@@ -61,5 +66,7 @@ if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     myapp = PyManzoni()
     myapp.show()
-    app.aboutToQuit.connect(lambda: myapp.closeEvent)  # FIXME Gives a type error because event is not defined
+    app.aboutToQuit.connect(
+        lambda: myapp.closeEvent
+    )  # FIXME Gives a type error because event is not defined
     sys.exit(app.exec_())
