@@ -1,14 +1,23 @@
 import sys
-from PySide2.QtWidgets import QFileDialog, QWidget, QTableWidgetItem, \
-    QHBoxLayout, QTableWidget, QDialogButtonBox, QPushButton,\
-    QApplication, QMainWindow, QVBoxLayout
+
 import georges_core
 from georges_core.sequences import SurveySequence
 from georges_core.units import ureg as _ureg
+from PySide2.QtWidgets import (
+    QApplication,
+    QDialogButtonBox,
+    QFileDialog,
+    QHBoxLayout,
+    QMainWindow,
+    QPushButton,
+    QTableWidget,
+    QTableWidgetItem,
+    QVBoxLayout,
+    QWidget,
+)
 
 
 class SequenceUi:
-
     def __init__(self, sequence_layout=None, element_list=None):
 
         self.layout_sequence = sequence_layout
@@ -25,7 +34,7 @@ class SequenceUi:
         # Add button signal
         button_layout = QHBoxLayout()
         buttonBox = QDialogButtonBox()
-        self.load_sequence_button = QPushButton(u"Load")
+        self.load_sequence_button = QPushButton("Load")
         self.load_sequence_button.clicked.connect(self.load_sequence)
         self.track_sequence_button = QPushButton("Track")
         button_layout.addWidget(self.load_sequence_button)
@@ -44,11 +53,19 @@ class SequenceUi:
         if self.sequence is not None:  # disconnect the signal first.
             self.sequence_tableWidget.itemChanged.disconnect()
 
-        df_filename, _ = QFileDialog.getOpenFileName(QWidget(), "Open File", "", "CSV Files (*.csv)")
+        df_filename, _ = QFileDialog.getOpenFileName(
+            QWidget(),
+            "Open File",
+            "",
+            "CSV Files (*.csv)",
+        )
 
         if df_filename:  # To avoid error if cancel is pressed
             # Give a default kinematics, this will be overwritten before the tracking
-            self.sequence = SurveySequence(filename=df_filename, kinematics=georges_core.Kinematics(230 * _ureg.MeV))
+            self.sequence = SurveySequence(
+                filename=df_filename,
+                kinematics=georges_core.Kinematics(230 * _ureg.MeV),
+            )
             self.sequence.expand()
             self.fill_table()
             self.fill_combobox()
@@ -67,10 +84,10 @@ class SequenceUi:
                 try:
                     x = sequence_df.iloc[i, j]
                     if isinstance(x, list):
-                        x = ['{:.3f}'.format(t.magnitude) for t in x]
-                        x = ' '.join(map(str, x))
+                        x = ["{:.3f}".format(t.magnitude) for t in x]
+                        x = " ".join(map(str, x))
                     else:
-                        x = '{:.3f}'.format(x.magnitude)
+                        x = "{:.3f}".format(x.magnitude)
                 except BaseException:
                     x = sequence_df.iloc[i, j]
                 if x:
@@ -92,7 +109,7 @@ class SequenceUi:
         self.element_list.addItems(self.sequence.df.index)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Create the Qt Application
     app = QApplication(sys.argv)
 

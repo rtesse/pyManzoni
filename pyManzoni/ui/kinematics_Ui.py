@@ -1,13 +1,12 @@
-from PySide2.QtCore import Qt
-from PySide2.QtWidgets import QMessageBox, QTableWidgetItem, QTableWidget
 from georges_core import Kinematics, KinematicsException
 from georges_core.units import ureg
+from PySide2.QtCore import Qt
+from PySide2.QtWidgets import QMessageBox, QTableWidget, QTableWidgetItem
 
 ROW_TO_UNITS = {1: ureg.MeV, 2: ureg.MeV / ureg.c, 3: ureg.T * ureg.m, 4: ureg.cm}
 
 
 class KinematicUi:
-
     def __init__(self, kinematics_layout):
 
         self.layout_kin = kinematics_layout
@@ -34,10 +33,26 @@ class KinematicUi:
 
     def change_table_values(self, new_kinematics):
         df_kinematics = self.layout_kin.itemAt(0).widget()
-        df_kinematics.setItem(1, 1, QTableWidgetItem('{:.3f}'.format(new_kinematics.ekin.m_as("MeV"))))
-        df_kinematics.setItem(2, 1, QTableWidgetItem('{:.3f}'.format(new_kinematics.momentum.m_as("MeV/c"))))
-        df_kinematics.setItem(3, 1, QTableWidgetItem('{:.3f}'.format(new_kinematics.brho.m_as("T m"))))
-        df_kinematics.setItem(4, 1, QTableWidgetItem('{:.3f}'.format(new_kinematics.range.m_as("cm"))))
+        df_kinematics.setItem(
+            1,
+            1,
+            QTableWidgetItem("{:.3f}".format(new_kinematics.ekin.m_as("MeV"))),
+        )
+        df_kinematics.setItem(
+            2,
+            1,
+            QTableWidgetItem("{:.3f}".format(new_kinematics.momentum.m_as("MeV/c"))),
+        )
+        df_kinematics.setItem(
+            3,
+            1,
+            QTableWidgetItem("{:.3f}".format(new_kinematics.brho.m_as("T m"))),
+        )
+        df_kinematics.setItem(
+            4,
+            1,
+            QTableWidgetItem("{:.3f}".format(new_kinematics.range.m_as("cm"))),
+        )
         df_kinematics.resizeColumnsToContents()
         df_kinematics.resizeRowsToContents()
 

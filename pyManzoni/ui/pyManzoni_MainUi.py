@@ -3,10 +3,10 @@ import sys
 from PySide2.QtCore import QSize
 from PySide2.QtWidgets import QApplication, QMainWindow
 
-from .menu_bar import MenuBar
-from .layout_widgets import LayoutWidgets
-from .kinematics_Ui import KinematicUi
 from .beam_Ui import BeamUi
+from .kinematics_Ui import KinematicUi
+from .layout_widgets import LayoutWidgets
+from .menu_bar import MenuBar
 from .sequence_ui import SequenceUi
 
 minimum_height = 700
@@ -14,7 +14,6 @@ minimum_width = 800
 
 
 class MainWindow(QMainWindow):
-
     def __init__(self, tmp_folder: str):
         super().__init__()
 
@@ -41,7 +40,7 @@ class MainWindow(QMainWindow):
         return self.s_ui.track_sequence_button
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app = QApplication(sys.argv)
 
     # Define the main window

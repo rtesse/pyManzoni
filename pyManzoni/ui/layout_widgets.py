@@ -1,14 +1,29 @@
-from PySide2.QtCore import Qt, QSize, QRect
-from PySide2.QtWidgets import QWidget, QTableWidgetItem, \
-    QHBoxLayout, QTableWidget, QPushButton,\
-    QMainWindow, QVBoxLayout, QComboBox, QLabel, QTabWidget, \
-    QDockWidget, QGridLayout, QSizePolicy
+from PySide2.QtCore import QRect, QSize, Qt
 from PySide2.QtWebEngineWidgets import QWebEngineView
+from PySide2.QtWidgets import (
+    QComboBox,
+    QDockWidget,
+    QGridLayout,
+    QHBoxLayout,
+    QLabel,
+    QMainWindow,
+    QPushButton,
+    QSizePolicy,
+    QTableWidget,
+    QTableWidgetItem,
+    QTabWidget,
+    QVBoxLayout,
+    QWidget,
+)
 
 
 class LayoutWidgets:
-
-    def __init__(self, main_window: QMainWindow = None, minimum_width: int = 0, minimum_height: int = 0):
+    def __init__(
+        self,
+        main_window: QMainWindow = None,
+        minimum_width: int = 0,
+        minimum_height: int = 0,
+    ):
         self.main_window = main_window
         self.minimum_width = minimum_width
         self.minimum_height = minimum_height
@@ -37,26 +52,30 @@ class LayoutWidgets:
 
     def create_sampler_widget(self):
         centralwidget = QWidget(self.main_window)
-        centralwidget.setObjectName(u"centralwidget")
-        centralwidget.setMinimumSize(QSize(int(2 * self.minimum_width / 3), int(0.9 * self.minimum_height / 2)))
+        centralwidget.setObjectName("centralwidget")
+        centralwidget.setMinimumSize(
+            QSize(int(2 * self.minimum_width / 3), int(0.9 * self.minimum_height / 2)),
+        )
         vl = QVBoxLayout(centralwidget)
-        vl.setObjectName(u"verticalLayout")
+        vl.setObjectName("verticalLayout")
         lh1 = QHBoxLayout()
-        lh1.setObjectName(u"layout_histograms")
+        lh1.setObjectName("layout_histograms")
 
         lh2 = QHBoxLayout()
-        lh2.setObjectName(u"layout_histograms")
+        lh2.setObjectName("layout_histograms")
 
         self.main_window.element_list = QComboBox(centralwidget)
         sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(2)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.main_window.element_list.sizePolicy().hasHeightForWidth())
+        sizePolicy.setHeightForWidth(
+            self.main_window.element_list.sizePolicy().hasHeightForWidth(),
+        )
         self.main_window.element_list.setSizePolicy(sizePolicy)
 
-        self.main_window.save_plot = QPushButton(u"Save")
+        self.main_window.save_plot = QPushButton("Save")
 
-        lh1.addWidget(QLabel(u"Element: "))
+        lh1.addWidget(QLabel("Element: "))
         lh1.addWidget(self.main_window.element_list)
         lh1.addWidget(self.main_window.save_plot)
 
@@ -149,20 +168,26 @@ class LayoutWidgets:
 
     def create_line_widget(self):
         self.dock_widget_line = QDockWidget(self.main_window)
-        self.dock_widget_line.setWindowTitle(u"Beamline")
-        self.dock_widget_line.setMinimumSize(QSize(self.minimum_width, int(0.9 * self.minimum_height / 2)))
-        self.dock_widget_line.setFeatures(QDockWidget.DockWidgetFloatable | QDockWidget.DockWidgetMovable)
+        self.dock_widget_line.setWindowTitle("Beamline")
+        self.dock_widget_line.setMinimumSize(
+            QSize(self.minimum_width, int(0.9 * self.minimum_height / 2)),
+        )
+        self.dock_widget_line.setFeatures(
+            QDockWidget.DockWidgetFloatable | QDockWidget.DockWidgetMovable,
+        )
         size_policy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         size_policy.setHorizontalStretch(0)
         size_policy.setVerticalStretch(0)
-        size_policy.setHeightForWidth(self.dock_widget_line.sizePolicy().hasHeightForWidth())
+        size_policy.setHeightForWidth(
+            self.dock_widget_line.sizePolicy().hasHeightForWidth(),
+        )
         self.dock_widget_line.setSizePolicy(size_policy)
         self.dock_widget_line.setFloating(False)
 
         # Add tab to the dock widget.
         dock_widget_contents_line = QWidget()
         hl = QHBoxLayout(dock_widget_contents_line)
-        hl.setObjectName(u"hl")
+        hl.setObjectName("hl")
         wtab = QTabWidget(dock_widget_contents_line)
         wtab.setEnabled(True)
         wtab.setTabBarAutoHide(False)
@@ -172,10 +197,10 @@ class LayoutWidgets:
         self.main_window.Yplane_view = QWebEngineView()
         self.main_window.line_view = QWebEngineView()
 
-        wtab.addTab(self.main_window.XYplane_view, u"X-Y plane")
-        wtab.addTab(self.main_window.Xplane_view, u"X plane")
-        wtab.addTab(self.main_window.Yplane_view, u"Y plane")
-        wtab.addTab(self.main_window.line_view, u"3D view")
+        wtab.addTab(self.main_window.XYplane_view, "X-Y plane")
+        wtab.addTab(self.main_window.Xplane_view, "X plane")
+        wtab.addTab(self.main_window.Yplane_view, "Y plane")
+        wtab.addTab(self.main_window.line_view, "3D view")
 
         wtab.setTabEnabled(3, False)
 
@@ -185,13 +210,19 @@ class LayoutWidgets:
 
     def create_properties_widget(self):
         dock_widget_properties = QDockWidget(self.main_window)
-        dock_widget_properties.setWindowTitle(u"Properties")
-        dock_widget_properties.setMinimumSize(QSize(int(self.minimum_width / 3), int(0.9 * self.minimum_height / 2)))
-        dock_widget_properties.setFeatures(QDockWidget.DockWidgetFloatable | QDockWidget.DockWidgetMovable)
+        dock_widget_properties.setWindowTitle("Properties")
+        dock_widget_properties.setMinimumSize(
+            QSize(int(self.minimum_width / 3), int(0.9 * self.minimum_height / 2)),
+        )
+        dock_widget_properties.setFeatures(
+            QDockWidget.DockWidgetFloatable | QDockWidget.DockWidgetMovable,
+        )
         size_policy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         size_policy.setHorizontalStretch(0)
         size_policy.setVerticalStretch(0)
-        size_policy.setHeightForWidth(dock_widget_properties.sizePolicy().hasHeightForWidth())
+        size_policy.setHeightForWidth(
+            dock_widget_properties.sizePolicy().hasHeightForWidth(),
+        )
         dock_widget_properties.setSizePolicy(size_policy)
         dock_widget_properties.setFloating(False)
 
@@ -221,7 +252,7 @@ class LayoutWidgets:
         self.main_window.sequence_layout.setContentsMargins(0, 0, 0, 0)
 
         # Add tab
-        beam_properties.addTab(kinematics_widget, u"Kinematics")
+        beam_properties.addTab(kinematics_widget, "Kinematics")
         beam_properties.addTab(beam_widget, "Beam distribution")
         beam_properties.addTab(sequence_widget, "Sequence")
 

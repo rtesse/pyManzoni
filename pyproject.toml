@@ -1,3 +1,14 @@
+[tool.black]
+line-length = 120
+target-version = ['py36', 'py37', 'py38']
+string_normalization = true
+magic_trailing_comma = true
+
+[tool.isort]
+profile = "black"
+line_length = 120
+include_trailing_comma = true
+
 [tool.poetry]
 name = "pymanzoni"
 version = "2022.1"
@@ -10,7 +21,6 @@ python = ">3.8.1 <3.10"
 PySide2 = "^5.15.2"
 lmfit = "^1.0.3"
 mpld3 = "^0.5.8"
-yapf = "^0.32.0"
 mypy = "^0.812"
 flake8 = "^4.0.1"
 georges = { path = "libs/georges/", develop = true }
@@ -26,8 +36,8 @@ m2r2 = {version = "^0.3.2"}
 pandoc = {version = "^2.2"}
 nbsphinx = {version = "^0.8.9"}
 PySideFlask = "^2.0"
-toml = "^0.10.2"
 pyinstaller = "^5.2"
+black = "^22.8.0"
 
 [tool.poetry.dev-dependencies]
 

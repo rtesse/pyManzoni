@@ -1,22 +1,36 @@
+import shutil
 import sys
-from PySide2 import QtCore
-from PySide2.QtCore import QRect, Qt
-from PySide2.QtWidgets import QFileDialog, QMessageBox, QWidget, QTableWidgetItem, \
-    QHBoxLayout, QTableWidget, QDialogButtonBox, QPushButton, QComboBox, QTabWidget,\
-    QApplication, QMainWindow, QVBoxLayout
-from PySide2.QtWebEngineWidgets import QWebEngineView
+
+import plotly.express as px
 from georges_core import Distribution
 from georges_core.units import ureg as _ureg
-import plotly.express as px
-import shutil
+from PySide2 import QtCore
+from PySide2.QtCore import QRect, Qt
+from PySide2.QtWebEngineWidgets import QWebEngineView
+from PySide2.QtWidgets import (
+    QApplication,
+    QComboBox,
+    QDialogButtonBox,
+    QFileDialog,
+    QHBoxLayout,
+    QMainWindow,
+    QMessageBox,
+    QPushButton,
+    QTableWidget,
+    QTableWidgetItem,
+    QTabWidget,
+    QVBoxLayout,
+    QWidget,
+)
 
 
 class BeamUi:
-
     def __init__(self, beam_layout, tmp_folder: str = None):
 
         self.layout_beam = beam_layout
-        self.beam = Distribution().from_5d_multigaussian_distribution(n=2)  # Default beam, 2 to avoid nan
+        self.beam = Distribution().from_5d_multigaussian_distribution(
+            n=2,
+        )  # Default beam, 2 to avoid nan
         self.tmp_dir = tmp_folder
         self.plotwindows = None
         self.initialize_Ui()
@@ -59,7 +73,7 @@ class BeamUi:
         self.change_beam()
 
         self.beam_list = QComboBox()
-        self.beam_list.setObjectName(u"element_list")
+        self.beam_list.setObjectName("element_list")
         self.beam_list.addItems(["Gaussian"])
         self.beam_list.addItems(["Twiss"])
         self.beam_list.addItems(["Sigma-Matrix"])
@@ -77,41 +91,41 @@ class BeamUi:
     def initialize_plot_layout(self):
         # Define the tab widget
         self.tabWidget = QTabWidget()
-        self.tabWidget.setObjectName(u"tabWidget")
+        self.tabWidget.setObjectName("tabWidget")
 
         # X-Y plane
         self.tab_xy = QWidget()
-        self.tab_xy.setObjectName(u"tab_xy")
+        self.tab_xy.setObjectName("tab_xy")
         self.XY_beam = QWebEngineView()
-        self.XY_beam.setObjectName(u"XY_beam")
+        self.XY_beam.setObjectName("XY_beam")
         self.tabWidget.addTab(self.XY_beam, "X - Y")
 
         # X - XP plane
         self.tab_xxp = QWidget()
-        self.tab_xxp.setObjectName(u"tab_xxp")
+        self.tab_xxp.setObjectName("tab_xxp")
         self.XPX_beam = QWebEngineView()
-        self.XPX_beam.setObjectName(u"XPX_beam")
+        self.XPX_beam.setObjectName("XPX_beam")
         self.tabWidget.addTab(self.XPX_beam, "X - PX")
 
         # Y - PY plane
         self.tab_yyp = QWidget()
-        self.tab_yyp.setObjectName(u"tab_yyp")
+        self.tab_yyp.setObjectName("tab_yyp")
         self.YPY_beam = QWebEngineView()
-        self.YPY_beam.setObjectName(u"YPY_beam")
+        self.YPY_beam.setObjectName("YPY_beam")
         self.tabWidget.addTab(self.YPY_beam, "Y - PY")
 
         # PX - PY plane
         self.tab_xpyp = QWidget()
-        self.tab_xpyp.setObjectName(u"tab_xpyp")
+        self.tab_xpyp.setObjectName("tab_xpyp")
         self.PXPY_beam = QWebEngineView()
-        self.PXPY_beam.setObjectName(u"PXPY_beam")
+        self.PXPY_beam.setObjectName("PXPY_beam")
         self.tabWidget.addTab(self.PXPY_beam, "PX - PY")
 
         # X - DPP plane
         self.tab_xdpp = QWidget()
-        self.tab_xdpp.setObjectName(u"tab_xdpp")
+        self.tab_xdpp.setObjectName("tab_xdpp")
         self.XDPP_beam = QWebEngineView()
-        self.XDPP_beam.setObjectName(u"PXPY_beam")
+        self.XDPP_beam.setObjectName("PXPY_beam")
         self.tabWidget.addTab(self.XDPP_beam, "X - DPP")
 
     def new_item(self):
@@ -119,8 +133,11 @@ class BeamUi:
         if current_row != 0:
             new_value = float(self.tableWidget.item(current_row, 1).text())
             self.horizontalLayout.itemAt(0).widget().blockSignals(True)
-            self.horizontalLayout.itemAt(0).widget().setItem(current_row, 1,
-                                                             QTableWidgetItem('{:.3e}'.format(new_value)))
+            self.horizontalLayout.itemAt(0).widget().setItem(
+                current_row,
+                1,
+                QTableWidgetItem("{:.3e}".format(new_value)),
+            )
             self.set_beam()
             self.horizontalLayout.itemAt(0).widget().blockSignals(False)
 
@@ -131,7 +148,7 @@ class BeamUi:
             pass
         finally:
             self.horizontalLayout.itemAt(0).widget().blockSignals(True)
-            if self.beamtype == 'Gaussian' or self.beamtype == "Userfile":
+            if self.beamtype == "Gaussian" or self.beamtype == "Userfile":
                 self.tableWidget.setRowCount(12)
                 beam_dist_str = QTableWidgetItem("Beam type")  # From a Qscroll
                 beam_dist_str.setFlags(Qt.ItemIsEnabled)
@@ -170,7 +187,7 @@ class BeamUi:
                 self.tableWidget.setItem(10, 0, mean_dpp_str)
                 self.tableWidget.setItem(11, 0, std_dpp_str)
 
-            if self.beamtype == 'Twiss':
+            if self.beamtype == "Twiss":
                 self.tableWidget.setRowCount(18)
                 beam_dist_str = QTableWidgetItem("Beam type")  # From a Qscroll
                 beam_dist_str.setFlags(Qt.ItemIsEnabled)
@@ -236,44 +253,66 @@ class BeamUi:
             self.tableWidget.resizeRowsToContents()
 
     def set_beam(self):
-        if self.beamtype == 'Gaussian':
+        if self.beamtype == "Gaussian":
             mean_val = self.beam.mean
             std_val = self.beam.std
-            n = self.beam.n_particles if self.tableWidget.item(1, 1) is None else float(
-                self.tableWidget.item(1, 1).text())
-            x = mean_val['X'] if self.tableWidget.item(2, 1) is None else float(self.tableWidget.item(2, 1).text())
-            px = mean_val['PX'] if self.tableWidget.item(3, 1) is None else float(self.tableWidget.item(3, 1).text())
-            xrms = std_val['X'] if self.tableWidget.item(4, 1) is None else float(self.tableWidget.item(4, 1).text())
-            pxrms = std_val['PX'] if self.tableWidget.item(5, 1) is None else float(self.tableWidget.item(5, 1).text())
-            y = mean_val['Y'] if self.tableWidget.item(6, 1) is None else float(self.tableWidget.item(6, 1).text())
-            py = mean_val['PY'] if self.tableWidget.item(7, 1) is None else float(self.tableWidget.item(7, 1).text())
-            yrms = std_val['Y'] if self.tableWidget.item(8, 1) is None else float(self.tableWidget.item(8, 1).text())
-            pyrms = std_val['PY'] if self.tableWidget.item(9, 1) is None else float(self.tableWidget.item(9, 1).text())
-            dpp = mean_val['DPP'] if self.tableWidget.item(10, 1) is None else float(
-                self.tableWidget.item(10, 1).text())
-            dpprms = std_val['DPP'] if self.tableWidget.item(11, 1) is None else float(
-                self.tableWidget.item(11, 1).text())
+            n = (
+                self.beam.n_particles
+                if self.tableWidget.item(1, 1) is None
+                else float(
+                    self.tableWidget.item(1, 1).text(),
+                )
+            )
+            x = mean_val["X"] if self.tableWidget.item(2, 1) is None else float(self.tableWidget.item(2, 1).text())
+            px = mean_val["PX"] if self.tableWidget.item(3, 1) is None else float(self.tableWidget.item(3, 1).text())
+            xrms = std_val["X"] if self.tableWidget.item(4, 1) is None else float(self.tableWidget.item(4, 1).text())
+            pxrms = std_val["PX"] if self.tableWidget.item(5, 1) is None else float(self.tableWidget.item(5, 1).text())
+            y = mean_val["Y"] if self.tableWidget.item(6, 1) is None else float(self.tableWidget.item(6, 1).text())
+            py = mean_val["PY"] if self.tableWidget.item(7, 1) is None else float(self.tableWidget.item(7, 1).text())
+            yrms = std_val["Y"] if self.tableWidget.item(8, 1) is None else float(self.tableWidget.item(8, 1).text())
+            pyrms = std_val["PY"] if self.tableWidget.item(9, 1) is None else float(self.tableWidget.item(9, 1).text())
+            dpp = (
+                mean_val["DPP"]
+                if self.tableWidget.item(10, 1) is None
+                else float(
+                    self.tableWidget.item(10, 1).text(),
+                )
+            )
+            dpprms = (
+                std_val["DPP"]
+                if self.tableWidget.item(11, 1) is None
+                else float(
+                    self.tableWidget.item(11, 1).text(),
+                )
+            )
 
-            self.beam = self.beam.from_5d_multigaussian_distribution(n=n,
-                                                                     x=x * _ureg.m,
-                                                                     px=px * _ureg.radians,
-                                                                     xrms=xrms * _ureg.m,
-                                                                     pxrms=pxrms * _ureg.radians,
-                                                                     y=y * _ureg.m,
-                                                                     py=py * _ureg.radians,
-                                                                     yrms=yrms * _ureg.m,
-                                                                     pyrms=pyrms * _ureg.radians,
-                                                                     dpp=dpp,
-                                                                     dpprms=dpprms)
-        if self.beamtype == 'Twiss':
+            self.beam = self.beam.from_5d_multigaussian_distribution(
+                n=n,
+                x=x * _ureg.m,
+                px=px * _ureg.radians,
+                xrms=xrms * _ureg.m,
+                pxrms=pxrms * _ureg.radians,
+                y=y * _ureg.m,
+                py=py * _ureg.radians,
+                yrms=yrms * _ureg.m,
+                pyrms=pyrms * _ureg.radians,
+                dpp=dpp,
+                dpprms=dpprms,
+            )
+        if self.beamtype == "Twiss":
             mean_val = self.beam.mean
-            n = self.beam.n_particles if self.tableWidget.item(1, 1) is None else float(
-                self.tableWidget.item(1, 1).text())
-            x = mean_val['X'] if self.tableWidget.item(2, 1) is None else float(self.tableWidget.item(2, 1).text())
-            px = mean_val['PX'] if self.tableWidget.item(3, 1) is None else float(self.tableWidget.item(3, 1).text())
-            y = mean_val['Y'] if self.tableWidget.item(4, 1) is None else float(self.tableWidget.item(4, 1).text())
-            py = mean_val['PY'] if self.tableWidget.item(5, 1) is None else float(self.tableWidget.item(5, 1).text())
-            dpp = mean_val['DPP'] if self.tableWidget.item(6, 1) is None else float(self.tableWidget.item(6, 1).text())
+            n = (
+                self.beam.n_particles
+                if self.tableWidget.item(1, 1) is None
+                else float(
+                    self.tableWidget.item(1, 1).text(),
+                )
+            )
+            x = mean_val["X"] if self.tableWidget.item(2, 1) is None else float(self.tableWidget.item(2, 1).text())
+            px = mean_val["PX"] if self.tableWidget.item(3, 1) is None else float(self.tableWidget.item(3, 1).text())
+            y = mean_val["Y"] if self.tableWidget.item(4, 1) is None else float(self.tableWidget.item(4, 1).text())
+            py = mean_val["PY"] if self.tableWidget.item(5, 1) is None else float(self.tableWidget.item(5, 1).text())
+            dpp = mean_val["DPP"] if self.tableWidget.item(6, 1) is None else float(self.tableWidget.item(6, 1).text())
             betx = 1 if self.tableWidget.item(7, 1) is None else float(self.tableWidget.item(7, 1).text())
             alfx = 0 if self.tableWidget.item(8, 1) is None else float(self.tableWidget.item(8, 1).text())
             bety = 1 if self.tableWidget.item(9, 1) is None else float(self.tableWidget.item(9, 1).text())
@@ -286,52 +325,104 @@ class BeamUi:
             disppy = 0 if self.tableWidget.item(16, 1) is None else float(self.tableWidget.item(16, 1).text())
             dpprms = 0 if self.tableWidget.item(17, 1) is None else float(self.tableWidget.item(17, 1).text())
 
-            self.beam = self.beam.from_twiss_parameters(n=n,
-                                                        x=x * _ureg.m,
-                                                        px=px,
-                                                        y=y * _ureg.m,
-                                                        py=py,
-                                                        dpp=dpp,
-                                                        betax=betx * _ureg.m,
-                                                        alphax=alfx,
-                                                        betay=bety * _ureg.m,
-                                                        alphay=alfy,
-                                                        emitx=emitx * _ureg.m * _ureg.radians,
-                                                        emity=emity * _ureg.m * _ureg.radians,
-                                                        dispx=dispx * _ureg.m,
-                                                        dispy=dispy * _ureg.m,
-                                                        dispxp=disppx,
-                                                        dispyp=disppy,
-                                                        dpprms=dpprms)
-        if self.beamtype == 'Sigma-Matrix':
-            QMessageBox.information(QWidget(), "Info", "Sigma not yet implemented", QMessageBox.Ok)
-        if self.beamtype == 'Userfile':
+            self.beam = self.beam.from_twiss_parameters(
+                n=n,
+                x=x * _ureg.m,
+                px=px,
+                y=y * _ureg.m,
+                py=py,
+                dpp=dpp,
+                betax=betx * _ureg.m,
+                alphax=alfx,
+                betay=bety * _ureg.m,
+                alphay=alfy,
+                emitx=emitx * _ureg.m * _ureg.radians,
+                emity=emity * _ureg.m * _ureg.radians,
+                dispx=dispx * _ureg.m,
+                dispy=dispy * _ureg.m,
+                dispxp=disppx,
+                dispyp=disppy,
+                dpprms=dpprms,
+            )
+        if self.beamtype == "Sigma-Matrix":
+            QMessageBox.information(
+                QWidget(),
+                "Info",
+                "Sigma not yet implemented",
+                QMessageBox.Ok,
+            )
+        if self.beamtype == "Userfile":
             # Load the beam
-            df_beam, _ = QFileDialog.getOpenFileName(None, "Open File", "", "CSV Files (*.csv)")
+            df_beam, _ = QFileDialog.getOpenFileName(
+                None,
+                "Open File",
+                "",
+                "CSV Files (*.csv)",
+            )
             if df_beam:  # To avoid error if cancel is pressed
-                self.beam.from_csv(path='.', filename=df_beam)
+                self.beam.from_csv(path=".", filename=df_beam)
 
         self.update_table()
 
     def update_table(self):
-        if self.beamtype == 'Gaussian' or self.beamtype == 'Userfile':
+        if self.beamtype == "Gaussian" or self.beamtype == "Userfile":
             self.horizontalLayout.itemAt(0).widget().blockSignals(True)
             mean_val = self.beam.mean
             std_val = self.beam.std
             self.tableWidget.setItem(1, 1, QTableWidgetItem(str(self.beam.n_particles)))
-            self.tableWidget.setItem(2, 1, QTableWidgetItem(str('{:.3e}'.format(mean_val['X']))))
-            self.tableWidget.setItem(3, 1, QTableWidgetItem(str('{:.3e}'.format(mean_val['PX']))))
-            self.tableWidget.setItem(4, 1, QTableWidgetItem(str('{:.3e}'.format(std_val['X']))))
-            self.tableWidget.setItem(5, 1, QTableWidgetItem(str('{:.3e}'.format(std_val['PX']))))
-            self.tableWidget.setItem(6, 1, QTableWidgetItem(str('{:.3e}'.format(mean_val['Y']))))
-            self.tableWidget.setItem(7, 1, QTableWidgetItem(str('{:.3e}'.format(mean_val['PY']))))
-            self.tableWidget.setItem(8, 1, QTableWidgetItem(str('{:.3e}'.format(std_val['Y']))))
-            self.tableWidget.setItem(9, 1, QTableWidgetItem(str('{:.3e}'.format(std_val['PY']))))
-            self.tableWidget.setItem(10, 1, QTableWidgetItem(str('{:.3e}'.format(mean_val['DPP']))))
-            self.tableWidget.setItem(11, 1, QTableWidgetItem(str('{:.3e}'.format(std_val['DPP']))))
+            self.tableWidget.setItem(
+                2,
+                1,
+                QTableWidgetItem(str("{:.3e}".format(mean_val["X"]))),
+            )
+            self.tableWidget.setItem(
+                3,
+                1,
+                QTableWidgetItem(str("{:.3e}".format(mean_val["PX"]))),
+            )
+            self.tableWidget.setItem(
+                4,
+                1,
+                QTableWidgetItem(str("{:.3e}".format(std_val["X"]))),
+            )
+            self.tableWidget.setItem(
+                5,
+                1,
+                QTableWidgetItem(str("{:.3e}".format(std_val["PX"]))),
+            )
+            self.tableWidget.setItem(
+                6,
+                1,
+                QTableWidgetItem(str("{:.3e}".format(mean_val["Y"]))),
+            )
+            self.tableWidget.setItem(
+                7,
+                1,
+                QTableWidgetItem(str("{:.3e}".format(mean_val["PY"]))),
+            )
+            self.tableWidget.setItem(
+                8,
+                1,
+                QTableWidgetItem(str("{:.3e}".format(std_val["Y"]))),
+            )
+            self.tableWidget.setItem(
+                9,
+                1,
+                QTableWidgetItem(str("{:.3e}".format(std_val["PY"]))),
+            )
+            self.tableWidget.setItem(
+                10,
+                1,
+                QTableWidgetItem(str("{:.3e}".format(mean_val["DPP"]))),
+            )
+            self.tableWidget.setItem(
+                11,
+                1,
+                QTableWidgetItem(str("{:.3e}".format(std_val["DPP"]))),
+            )
             self.horizontalLayout.itemAt(0).widget().blockSignals(False)
 
-        if self.beamtype == 'Twiss':
+        if self.beamtype == "Twiss":
             self.horizontalLayout.itemAt(0).widget().blockSignals(True)
             mean_val = self.beam.mean
             # I don't want to change the values dynamically
@@ -348,26 +439,83 @@ class BeamUi:
             dpprms = 0 if self.tableWidget.item(17, 1) is None else float(self.tableWidget.item(17, 1).text())
             #
             self.tableWidget.setItem(1, 1, QTableWidgetItem(str(self.beam.n_particles)))
-            self.tableWidget.setItem(2, 1, QTableWidgetItem(str('{:3f}'.format(mean_val['X']))))
-            self.tableWidget.setItem(3, 1, QTableWidgetItem(str('{:.3e}'.format(mean_val['PX']))))
-            self.tableWidget.setItem(4, 1, QTableWidgetItem(str('{:.3e}'.format(mean_val['Y']))))
-            self.tableWidget.setItem(5, 1, QTableWidgetItem(str('{:.3e}'.format(mean_val['PY']))))
-            self.tableWidget.setItem(6, 1, QTableWidgetItem(str('{:.3e}'.format(mean_val['DPP']))))
-            self.tableWidget.setItem(7, 1, QTableWidgetItem(str('{:.3e}'.format(betx))))
-            self.tableWidget.setItem(8, 1, QTableWidgetItem(str('{:.3e}'.format(alfx))))
-            self.tableWidget.setItem(9, 1, QTableWidgetItem(str('{:.3e}'.format(bety))))
-            self.tableWidget.setItem(10, 1, QTableWidgetItem(str('{:.3e}'.format(alfy))))
-            self.tableWidget.setItem(11, 1, QTableWidgetItem(str('{:.3e}'.format(emitx))))
-            self.tableWidget.setItem(12, 1, QTableWidgetItem(str('{:.3e}'.format(emity))))
-            self.tableWidget.setItem(13, 1, QTableWidgetItem(str('{:.3e}'.format(dispx))))
-            self.tableWidget.setItem(14, 1, QTableWidgetItem(str('{:.3e}'.format(dispy))))
-            self.tableWidget.setItem(15, 1, QTableWidgetItem(str('{:.3e}'.format(disppx))))
-            self.tableWidget.setItem(16, 1, QTableWidgetItem(str('{:.3e}'.format(disppy))))
-            self.tableWidget.setItem(17, 1, QTableWidgetItem(str('{:.3e}'.format(dpprms))))
+            self.tableWidget.setItem(
+                2,
+                1,
+                QTableWidgetItem(str("{:3f}".format(mean_val["X"]))),
+            )
+            self.tableWidget.setItem(
+                3,
+                1,
+                QTableWidgetItem(str("{:.3e}".format(mean_val["PX"]))),
+            )
+            self.tableWidget.setItem(
+                4,
+                1,
+                QTableWidgetItem(str("{:.3e}".format(mean_val["Y"]))),
+            )
+            self.tableWidget.setItem(
+                5,
+                1,
+                QTableWidgetItem(str("{:.3e}".format(mean_val["PY"]))),
+            )
+            self.tableWidget.setItem(
+                6,
+                1,
+                QTableWidgetItem(str("{:.3e}".format(mean_val["DPP"]))),
+            )
+            self.tableWidget.setItem(7, 1, QTableWidgetItem(str("{:.3e}".format(betx))))
+            self.tableWidget.setItem(8, 1, QTableWidgetItem(str("{:.3e}".format(alfx))))
+            self.tableWidget.setItem(9, 1, QTableWidgetItem(str("{:.3e}".format(bety))))
+            self.tableWidget.setItem(
+                10,
+                1,
+                QTableWidgetItem(str("{:.3e}".format(alfy))),
+            )
+            self.tableWidget.setItem(
+                11,
+                1,
+                QTableWidgetItem(str("{:.3e}".format(emitx))),
+            )
+            self.tableWidget.setItem(
+                12,
+                1,
+                QTableWidgetItem(str("{:.3e}".format(emity))),
+            )
+            self.tableWidget.setItem(
+                13,
+                1,
+                QTableWidgetItem(str("{:.3e}".format(dispx))),
+            )
+            self.tableWidget.setItem(
+                14,
+                1,
+                QTableWidgetItem(str("{:.3e}".format(dispy))),
+            )
+            self.tableWidget.setItem(
+                15,
+                1,
+                QTableWidgetItem(str("{:.3e}".format(disppx))),
+            )
+            self.tableWidget.setItem(
+                16,
+                1,
+                QTableWidgetItem(str("{:.3e}".format(disppy))),
+            )
+            self.tableWidget.setItem(
+                17,
+                1,
+                QTableWidgetItem(str("{:.3e}".format(dpprms))),
+            )
             self.horizontalLayout.itemAt(0).widget().blockSignals(False)
 
     def save_beam(self):
-        filename = QFileDialog.getSaveFileName(None, "Open File", "beam_distribution.csv", "CSV Files (*.csv)")
+        filename = QFileDialog.getSaveFileName(
+            None,
+            "Open File",
+            "beam_distribution.csv",
+            "CSV Files (*.csv)",
+        )
         if filename[0] != "":  # Cancel is not pressed
             self.beam.distribution.to_csv(filename[0], index=False)
 
@@ -387,38 +535,50 @@ class BeamUi:
         template = {
             "layout": {
                 "autosize": True,
-                'margin': dict(t=0, b=50, l=50, r=50),
-            }
+                "margin": dict(t=0, b=50, l=50, r=50),
+            },
         }
 
-        self.generate_plot(template, 'X', 'Y', 'x (m)', 'y (m)')
-        self.generate_plot(template, 'X', 'PX', 'x (m)', 'xp (radians)')
-        self.generate_plot(template, 'Y', 'PY', 'y (m)', 'yp (radians)')
-        self.generate_plot(template, 'PX', 'PY', 'xp (radians)', 'yp (radians)')
-        self.generate_plot(template, 'X', 'DPP', 'x (m)', 'dpp (-)')
+        self.generate_plot(template, "X", "Y", "x (m)", "y (m)")
+        self.generate_plot(template, "X", "PX", "x (m)", "xp (radians)")
+        self.generate_plot(template, "Y", "PY", "y (m)", "yp (radians)")
+        self.generate_plot(template, "PX", "PY", "xp (radians)", "yp (radians)")
+        self.generate_plot(template, "X", "DPP", "x (m)", "dpp (-)")
 
-        self.XY_beam.load(QtCore.QUrl().fromLocalFile(f"{self.tmp_dir}/distribution_XY.html"))
+        self.XY_beam.load(
+            QtCore.QUrl().fromLocalFile(f"{self.tmp_dir}/distribution_XY.html"),
+        )
 
-        self.XPX_beam.load(QtCore.QUrl().fromLocalFile(f"{self.tmp_dir}/distribution_XPX.html"))
+        self.XPX_beam.load(
+            QtCore.QUrl().fromLocalFile(f"{self.tmp_dir}/distribution_XPX.html"),
+        )
 
-        self.YPY_beam.load(QtCore.QUrl().fromLocalFile(f"{self.tmp_dir}/distribution_YPY.html"))
+        self.YPY_beam.load(
+            QtCore.QUrl().fromLocalFile(f"{self.tmp_dir}/distribution_YPY.html"),
+        )
 
-        self.PXPY_beam.load(QtCore.QUrl().fromLocalFile(f"{self.tmp_dir}/distribution_PXPY.html"))
+        self.PXPY_beam.load(
+            QtCore.QUrl().fromLocalFile(f"{self.tmp_dir}/distribution_PXPY.html"),
+        )
 
-        self.XDPP_beam.load(QtCore.QUrl().fromLocalFile(f"{self.tmp_dir}/distribution_XDPP.html"))
+        self.XDPP_beam.load(
+            QtCore.QUrl().fromLocalFile(f"{self.tmp_dir}/distribution_XDPP.html"),
+        )
 
     def generate_plot(self, template, columns1, columns2, label1, label2):
 
-        fig = px.density_heatmap(self.beam.distribution,
-                                 x=self.beam.distribution[columns1],
-                                 y=self.beam.distribution[columns2],
-                                 nbinsx=50,
-                                 nbinsy=50,
-                                 marginal_x='histogram',
-                                 marginal_y='histogram',
-                                 width=600,
-                                 height=600,
-                                 template=template)
+        fig = px.density_heatmap(
+            self.beam.distribution,
+            x=self.beam.distribution[columns1],
+            y=self.beam.distribution[columns2],
+            nbinsx=50,
+            nbinsy=50,
+            marginal_x="histogram",
+            marginal_y="histogram",
+            width=600,
+            height=600,
+            template=template,
+        )
         fig.update_xaxes(title=label1)
         fig.write_html(f"{self.tmp_dir}/distribution_{columns1}{columns2}.html")
 
@@ -426,7 +586,7 @@ class BeamUi:
         shutil.rmtree(self.tmp_dir)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Create the Qt Application
     app = QApplication(sys.argv)
 
