@@ -32,8 +32,8 @@ sphinxcontrib-bibtex = {version = "^2.4.2"}
 sphinx-copybutton = {version = "^0.5.0"}
 sphinx-autobuild = {version = "^2021.3.14"}
 sphinx-rtd-theme = {version = "^1.0.0"}
+jupyter_core = {version = "^4.11.2"}
 m2r2 = {version = "^0.3.2"}
-pandoc = {version = "^2.2"}
 nbsphinx = {version = "^0.8.9"}
 PySideFlask = "^2.0"
 pyinstaller = "^5.2"
